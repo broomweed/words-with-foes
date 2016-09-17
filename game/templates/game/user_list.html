@@ -1,0 +1,30 @@
+{% include "game/header.html" %}
+{% load words_goodies %}
+</div>
+</div>
+<div style="width: 100%;">
+<div style="width: 700px; margin: auto">
+<div style="width: 100%; text-align: left;">
+<form action="{% url "user_search" %}" method="get">
+search for a user: <input type="text" name="q" style="width: 250px;" /> <input type="submit" value=" search " />
+</form>
+</div>
+<div style="float:left;">
+user
+</div>
+<div style="float:right;">joined on</div>
+<div style="clear:both;"></div>
+</div>
+</div>
+{% for account in users %}
+<div style="width: 100%; background-color: {{ account.profile.fav_color }}">
+<div style="width: 700px; margin: auto">
+<div style="float:left;">
+<a href="{% url "profile" account.username %}" class="black"><b>{{ account.username }}</b></a>
+</div>
+<div style="float:right;">{{ account.date_joined|datefmt0 }}</div>
+<div style="clear:both;"></div>
+</div>
+</div>
+{% endfor %}
+{% include "game/footer.html" %}

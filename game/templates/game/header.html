@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>
+    words with enemies{% if page_name %} - {{ page_name }}{% endif %}
+</title>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "style.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "colorpicker.css" %}" />
+{% if include_game_resources %}
+{% if game_state and viewable %}
+<script type="text/javascript">
+board_string = "{{ game_state.board }}";
+{% if is_p1 %}
+letters_string = "{{ game_state.p1_letters }}";
+{% else %}
+letters_string = "{{ game_state.p2_letters }}";
+{% endif %}
+game_id = {{ game_id }};
+{% if highlight_squares %}
+highlight_squares = [
+{% for square in highlight_squares %}
+    [{{ square.0 }}, {{ square.1 }}],
+{% endfor %}
+];
+{% else %}
+"{{ game_state.last_word_pos }}";
+first_highlight_square = null;
+last_highlight_square = null;
+{% endif %}
+</script>
+{% endif %}
+<link rel="stylesheet" type="text/css" href="{% static "game.css" %}" />
+<script type="text/javascript" src="{% static "game.js" %}"></script>
+{% endif %}
+</head>
+<body>
+<div id="header">
+    <div id="header-left"><tt><a href="{% url 'index' %}"><span id='words'>words</span><span id='with'>with</span><span id='enemies'>enemies</span></a>
+            {% if symbol %}<span style="color: {{ symbol_color }};" title='{{symbol_alt}}'>&#{{symbol}};</span>{% endif %}</tt></div>
+    <div id="header-right">
+        {% if not logged_in %}
+        <a href="{% url 'login' %}">log in</a> / <a href="{% url 'register' %}">register</a>
+        {% else %}
+        <span style="font-weight: bold; background-color: {{ user.profile.fav_color }}; color: black;">
+            &nbsp;<a style="color: black;" href="{% url "profile" user.username %}">{{ user.username }}</a>&nbsp;</span>(<a href="{% url 'play' %}">4</a>)
+        <a href="{% url 'logout' %}">log out</a>
+        {% endif %}
+    </div>
+    <div id="header-end"></div>
+</div>
+{% if navbar or page_name %}
+<div id='navbar'>
+    <div id='navbar-text'>
+        {% for item in navbar %}
+        {% if item.arg %}
+        <a href="{% url item.page item.arg %}">{{ item.name }}</a> /
+        {% else %}
+        <a href="{% url item.page %}">{{ item.name }}</a> /
+        {% endif %}
+        {% endfor %}
+        <b>{{ page_name }}</b>
+    </div>
+</div>
+{% endif %}
+<div class="content-wrapper">
+    <div class="content">
+        <br />

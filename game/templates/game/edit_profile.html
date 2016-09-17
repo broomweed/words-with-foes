@@ -1,0 +1,47 @@
+{% include "game/header.html" %}
+{% if errors %}
+<div class="error">
+<ul>
+{% for error in errors %}
+<li>{{ error }}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+</div></div>
+<div class="content-wrapper" style="background-color: {% if msg %}{{ user.profile.fav_color }}{% else %}{{ viewed.profile.fav_color }}{% endif %}"><div class="content"><div style="width: 600px; margin: auto; text-align: left;">
+{% if msg %}
+&#x2713; {{ msg }}
+{% else %}
+{% if viewed.username == user.username %}
+<i>edit your profile</i>
+{% else %}
+<i>edit <b>{{ viewed.username }}</b>'s profile</i>
+{% endif %}
+{% endif %}
+</div></div></div>
+<div class="content-wrapper"><div class="content"><div style="width: 600px; margin: auto;">
+<br />
+<form action="{% url "edit_profile" viewed.username %}" method="post">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;password: <input type="password" name="pass" /><br />
+&nbsp;password also: <input type="password" name="pass2" /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;email: <input type="text" name="email" value="{{ viewed.email }}" /><br />
+favorite color:
+<div class="colorpicker">
+{% for name, hex in colors %}<input type="radio" name="favcolor" value="{{ hex }}" class="picker {{ name }}" title="{{ name }}"{% if viewed.profile.fav_color == hex %} checked{% endif %} />
+{% endfor %}
+</div><br />
+<div style="display: inline-block; vertical-align: top; padding-top: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bio:</div>
+<div style="display: inline-block;">
+<textarea name="bio">{{ viewed.profile.bio }}</textarea>
+</div>
+<br />
+<br />
+<div style="text-align: right;">
+{% csrf_token %}
+<a class="submit-button" href="{% url "profile" viewed.username %}">&nbsp;cancel&nbsp;</a>
+<input type="submit" value=" save " />
+</form>
+</div>
+</div>
+{% include "game/footer.html" %}

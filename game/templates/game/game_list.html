@@ -1,0 +1,139 @@
+{% include "game/header.html" %}
+    </div>
+</div>
+{% load words_goodies %}
+{% if challenges|length > 0 %}
+<div style="width: 100%;">
+    <div style="width: 700px; margin: auto">
+        <i>your unfinished business</i>
+    </div>
+</div>
+{% endif %}
+
+<!-- Game list -->
+{% for game in challenges %}
+<div style="width: 100%">
+    <div style="width: 700px; margin: auto; position:relative;">
+        <div style="position: absolute; top: 0; left: 0; z-index: 3;">
+            <b>
+                {% if game.player_1 == user %}
+                <a href="{% url "profile" game.player_2.username %}" class="black">{{ game.player_2.username }}</a>
+                {% else %}
+                <a href="{% url "profile" game.player_1.username %}" class="black">{{ game.player_1.username }}</a>
+                {% endif %}
+            </b>
+        </div>
+    </div>
+    <a href="{% url "play" game.id %}" class="nonlink">
+        <div style="width: 100%; background-color: {% if game.player_1 == user %}{{ game.player_2.profile.fav_color }}{% else %}{{ game.player_1.profile.fav_color }}{% endif %};" class="highlight-list">
+            <div style="width: 700px; margin: auto; position: relative;">
+                <div style="text-align: right;">
+                    <b>{{ game.date_started|datetimefmt }}</b>
+                </div>
+                <div style="width: 100%;">
+                    you haven't made the first move yet!
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
+{% endfor %}
+
+{% if challenges|length == 0 or your_games|length > 0 %}
+<div style="width: 100%;">
+    <div style="width: 700px; margin: auto">
+        {% if challenges|length > 0 %}
+        <br />
+        {% endif %}
+        <i>your turn</i>
+    </div>
+</div>
+{% for game in your_games %}
+<div style="width: 100%">
+    <div style="width: 700px; margin: auto; position:relative;">
+        <div style="position: absolute; top: 0; left: 0; z-index: 3;">
+            <b>
+                {% if game.player_1 == user %}
+                <a href="{% url "profile" game.player_2.username %}" class="black">{{ game.player_2.username }}</a>
+                {% else %}
+                <a href="{% url "profile" game.player_1.username %}" class="black">{{ game.player_1.username }}</a>
+                {% endif %}
+            </b>
+        </div>
+    </div>
+    <a href="{% url "play" game.id %}" class="nonlink">
+        <div style="width: 100%; background-color: {% if game.player_1 == user %}{{ game.player_2.profile.fav_color }}{% else %}{{ game.player_1.profile.fav_color }}{% endif %};" class="highlight-list">
+            <div style="width: 700px; margin: auto; position: relative;">
+                {% if game.someone_moved %}
+                <div style="text-align: right;">
+                    <b>{{ game.last_move|datetimefmt }}</b>
+                </div>
+                <div style="width: 100%;">
+                    they played <b>{{ game.game_state.last_word }}</b> for <b>40</b> pts.
+                </div>
+                {% else %}
+                <div style="text-align: right;">
+                    <b>{{ game.date_started|datetimefmt }}</b>
+                </div>
+                <div style="width: 100%;">
+                    they are letting you go first!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </a>
+</div>
+{% endfor %}
+{% if your_games|length == 0 and challenges|length == 0 %}
+<div style="width: 100%;">
+    <div style="width: 700px; margin: auto">
+        it's not your turn in any games right now. want to <a href="{% url "new_game" %}">start a new game</a>?
+    </div>
+</div>
+{% endif %}
+{% endif %}
+{% if their_games|length > 0 %}
+<div style="width: 100%;">
+    <div style="width: 700px; margin: auto">
+        <br />
+        <i>their turn</i>
+    </div>
+</div>
+{% for game in their_games %}
+<div style="width: 100%">
+    <div style="width: 700px; margin: auto; position:relative;">
+        <div style="position: absolute; top: 0; left: 0; z-index: 3;">
+            <b>
+                {% if game.player_1 == user %}
+                <a href="{% url "profile" game.player_2.username %}" class="black">{{ game.player_2.username }}</a>
+                {% else %}
+                <a href="{% url "profile" game.player_1.username %}" class="black">{{ game.player_1.username }}</a>
+                {% endif %}
+            </b>
+        </div>
+    </div>
+    <a href="{% url "play" game.id %}" class="nonlink">
+        <div style="width: 100%; background-color: {% if game.player_1 == user %}{{ game.player_2.profile.fav_color }}{% else %}{{ game.player_1.profile.fav_color }}{% endif %};" class="highlight-list">
+            <div style="width: 700px; margin: auto; position: relative;">
+                {% if game.someone_moved %}
+                <div style="text-align: right;">
+                    <b>{{ game.last_move|datetimefmt }}</b>
+                </div>
+                <div style="width: 100%;">
+                    you played <b>{{ game.game_state.last_word }}</b> for <b>40</b> pts.
+                </div>
+                {% else %}
+                <div style="text-align: right;">
+                    <b>{{ game.date_started|datetimefmt }}</b>
+                </div>
+                <div style="width: 100%;">
+                    you are letting them go first!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </a>
+</div>
+{% endfor %}
+{% endif %}
+{% include "game/footer.html" %}

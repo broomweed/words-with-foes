@@ -1,0 +1,48 @@
+/* Color picker stuff. */
+div.colorpicker {
+    position: relative;
+    display: inline;
+}
+
+input[type="radio"].picker {
+    display: inline;
+    width: 33px;
+}
+
+input[type="radio"].picker:before {
+    content: "\a0\a0";
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    position: absolute;
+    top: 5px;
+    border: 1px solid white;
+}
+
+input[type="radio"].picker.red:before {
+    background-color: #ff6f4f;
+}
+
+input[type="radio"].picker.purple:before {
+    background-color: #db4aff;
+}
+
+input[type="radio"].picker.yellow:before {
+    background-color: #ffff3a;
+}
+
+input[type="radio"].picker.green:before {
+    background-color: #baf872;
+}
+
+input[type="radio"].picker.blue:before {
+    background-color: #45caff;
+}
+
+input[type="radio"].picker.tan:before {
+    background-color: #f3d782;
+}
+
+input[type="radio"].picker:checked:before {
+    border: 1px solid black;
+}

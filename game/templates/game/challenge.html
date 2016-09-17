@@ -1,0 +1,31 @@
+{% include "game/header.html" %}
+</div>
+<div style="width: 100%; background-color: {{ challenged.profile.fav_color }}">
+<div style="width: 700px; margin: auto; text-align: left">
+create game with <b>{{ challenged.username }}</b>
+</div>
+</div>
+<br />
+<br />
+<div class="content-wrapper">
+    <div class="content">
+<div style="width: 700px; margin: auto;">
+    <form action="{% url "challenge" challenged.username %}" method="POST">
+        <input type="checkbox" id="public" name="public" />
+        <label for="public">make this game public</label>
+        <br />
+        <input type="checkbox" id="go_second" name="go_second" />
+        <label for="go_second">let <b>{{ challenged.username }}</b> go first</label>
+        <br />
+        <input type="checkbox" id="hat" name="hat" />
+        <label for="hat">hat-based game</label>
+        <br />
+        <br />
+        {% csrf_token %}
+        <!--div style="width: 100%; text-align: right;"-->
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value=" create " />
+        <!--/div-->
+    </div>
+</form>
+</div>
+{% include "game/footer.html" %}

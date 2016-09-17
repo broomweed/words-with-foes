@@ -1,0 +1,5 @@
+{% include "game/header.html" %}
+congratulations, <b><span style="color: {{ color }}">{{ new_user }}</span></b>! you have registered successfully!<br />
+<br />
+if you want to, you can <a href="{% url "login" %}?next={% url "profile" new_user %}">log in</a> now.
+{% include "game/footer.html" %}

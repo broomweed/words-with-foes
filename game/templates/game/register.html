@@ -1,0 +1,39 @@
+{% include "game/header.html" %}
+</div>
+</div>
+<div class="content-wrapper">
+<div style="width: 590px; margin: auto; text-align: left;">
+<i>so nice of you to join us!</i>
+<br />
+{% if errors %}
+<div class="error">
+<ul>
+{% for error in errors %}
+<li>{{ error }}</li>
+{% endfor %}
+</ul>
+</div>
+{% else %}
+<br />
+{% endif %}
+<form action="{% url "register" %}" method="post">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;username: <input type="text" name="username" maxlength="30" /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;password: <input type="password" name="pass" /><br />
+&nbsp;password also: <input type="password" name="pass2" /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;email: <input type="text" name="email" /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;email also: <input type="text" name="email2" /><br />
+favorite color:
+<div class="colorpicker">
+{% for name, hex in colors %}<input type="radio" name="favcolor" value="{{ hex }}" class="picker {{ name }}" title="{{ name }}"{% if viewed.profile.fav_color == hex %} checked{% endif %} />
+{% endfor %}
+</div>
+<br />
+<br />
+{% csrf_token %}
+<div style="text-align: right;">
+<input type="submit" value=" register " />
+</form>
+</div>
+{% include "game/footer.html" %}
+
+

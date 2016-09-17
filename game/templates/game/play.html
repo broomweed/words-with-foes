@@ -1,0 +1,83 @@
+{% include "game/header.html" %}
+{% if viewable %}
+</div></div>
+    {% if game.someone_moved %}
+        {% if is_p1 and game.p1_turn %}
+            <div style="background-color: {{ game.player_2.profile.fav_color }};">
+                <div style="margin: auto; text-align: center;">
+                    <b>{{ game.player_2.username }}</b>
+        {% elif not is_p1 and not game.p1_turn %}
+            <div style="background-color: {{ game.player_1.profile.fav_color }};">
+                <div style="margin: auto; text-align: center;">
+                    <b>{{ game.player_1.username }}</b>
+        {% else %}
+            <div style="background-color: {{ user.profile.fav_color }};">
+                <div style="margin: auto; text-align: center;">
+                    you
+        {% endif %}
+        played
+        <b>{{ game.game_state.last_word }}</b>
+        for
+        <b>{# ?? #} 40</b>
+        points.
+                </div>
+            </div>
+    {% else %}
+        {% if is_p1 and game.p1_turn or not is_p1 and not game.p1_turn %}
+            <div style="background-color: {{ user.profile.fav_color }};">
+                <div style="margin: auto; text-align: center;">
+                    you
+        {% else %}
+            {% if is_p1 %}
+                <div style="background-color: {{ game.player_2.profile.fav_color }};">
+                    <div style="margin: auto; text-align: center;">
+                        <b>{{ game.player_2.username }}</b>
+            {% else %}
+                <div style="background-color: {{ game.player_1.profile.fav_color }};">
+                    <div style="margin: auto; text-align: center;">
+                        <b>{{ game.player_1.username }}</b>
+            {% endif %}
+        {% endif %}
+        must make the first move!
+                </div>
+            </div>
+    {% endif %}
+
+
+<div style="text-align: center;">
+    <br />
+    <div id="board" style="margin:auto; min-width:250px;">
+        sorry, you need javascript enabled in order to play this game!
+    </div>
+</div>
+</div></div>
+<br />
+<div style="width: 100%; background-color: {{ game.player_1.profile.fav_color }}">
+    <div style="width: 535px; margin: auto">
+        <div style="float:left;">
+            {% if game.p1_turn %}&gt;{% else %}&nbsp;{% endif %}
+            <a href="{% url "profile" game.player_1.username %}" class="black"><b>{{ game.player_1.username }}</b></a>
+        </div>
+        <div style="float:right;">{{ game.game_state.p1_score }}&nbsp;&nbsp;</div>
+        <div style="clear:both;"></div>
+    </div>
+</div>
+<div style="width: 100%; background-color: {{ game.player_2.profile.fav_color }}">
+    <div style="width: 535px; margin: auto">
+        <div style="float:left;">
+            {% if not game.p1_turn %}&gt;{% else %}&nbsp;{% endif %}
+            <a href="{% url "profile" game.player_2.username %}" class="black"><b>{{ game.player_2.username }}</b></a>
+        </div>
+        <div style="float:right;">{{ game.game_state.p2_score }}&nbsp;&nbsp;</div>
+        <div style="clear:both;"></div>
+    </div>
+</div>
+<div style="text-align: center;">
+    <b>{{ game.game_state.draw_pile|length }}</b> tiles left in the draw pile{% if game.game_state.draw_pile|length < 10 %}!{% endif %}
+</div>
+{% else %}
+you don't have access to view this game!<br />
+<br />
+why don't you try one of <a href="{% url "play" %}">your games</a> instead?
+{% endif %}
+{% include "game/footer.html" %}

@@ -1,0 +1,34 @@
+{% include "game/header.html" %}
+{% load words_goodies %}
+</div>
+</div>
+<div style="width: 100%; background-color: {{ viewed.profile.fav_color }}">
+<div style="width: 700px; margin: auto">
+<div style="float:left;">
+<b>{{ viewed.username }}</b>
+</div>
+{% if viewed.username == user.username or user.is_staff %}
+<div style="float:right;"><a href="{% url "edit_profile" viewed.username %}" class="black">edit profile</a></div>
+{% elif viewed.is_staff %}
+<div style="float:right;">clearance: <i>staff</i></div>
+{% endif %}
+<div style="clear:both;"></div>
+</div>
+</div>
+<div id="content-wrapper">
+    <div id="content">
+        <div style="width: 700px; margin: auto">
+            <br />
+            date joined: <b>{{ datejoined | datefmt }}</b><br />
+            &nbsp;last login: <b>{{ lastseen | datefmt }}</b>
+{% if viewed.profile.bio %}
+            <br />
+            <div style="display: inline-block; vertical-align: top; padding-top: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bio:</div>
+            <div style="display: inline-block; max-width: 490px; padding-top: 2px; white-space: pre-line"> <!-- nifty trick!! white-space: pre-line; wraps on line breaks! who knew! -->{{ viewed.profile.bio }}</div>
+{% endif %}
+            <br /><br />
+{% if viewed.username != user.username %}
+            <a href="{% url "challenge" viewed.username %}">start a new game with {{ viewed.username }}</a>
+{% endif %}
+        </div>
+{% include "game/footer.html" %}

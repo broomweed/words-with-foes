@@ -1,37 +1,16 @@
+import json
+
 # Real words that aren't accepted.
-dictionary = [
-    "hat",
-    "at",
-    "that",
-    "vat",
-    "ta",
-    "ha",
-    "hath",
-    "ah",
-    "aha",
-    "atta",
-]
+print ("[words-with-enemies] parsing dictionary...")
+with open("game/dict/english.txt") as word_file:
+    dictionary = set(word.strip().lower() for word in word_file)
 
 # The 2nd-order Markov chain for validating words.
-transitions = {
-    "*a": [ "t", "h", "v" ],
-    "*h": [ "a" ],
-    "*t": [ "a", "h" ],
-    "*v": [ "a" ],
-    "ha": [ "t", "h", "v", "*" ],
-    "ah": [ "a", "*" ],
-    "ta": [ "t", "h", "v", "*" ],
-    "at": [ "a", "h", "v", "t", "*" ],
-    "th": [ "a", "*" ],
-    "ht": [ "a" ],
-    "va": [ "t", "h", "v", "*" ],
-    "av": [ "a", "h", "*" ],
-    "vh": [ "a" ],
-    "hv": [ "a" ],
-    "tv": [ "a" ],
-    "vt": [ "h", "a" ],
-    "tt": [ "a", "*" ],
-}
+print ("[words-with-enemies] parsing transition file...")
+with open("game/dict/transitions.txt") as transitions_file:
+    transitions = json.load(transitions_file)
+
+print ("[words-with-enemies] ready.")
 
 # How many points each letter is worth.
 scores = {
@@ -65,24 +44,24 @@ scores = {
 };
 
 # Locations of bonus squares.
-bonus = [
-    [7, 7, "c"],
-    [3, 0, "tw"],
-    [2, 1, "dl"],
-    [1, 2, "dl"],
-    [0, 3, "tw"],
-    [6, 0, "tl"],
-    [8, 0, "tl"],
-    [5, 1, "dw"],
-    [9, 1, "dw"],
-    [4, 2, "dl"],
-    [10, 2, "dl"],
-    [3, 3, "tl"],
-    [3, 7, "dw"],
-    [4, 6, "dl"],
-    [5, 5, "tl"],
-    [6, 4, "dl"],
-];
+bonus = {
+    (7, 7): "c",
+    (3, 0): "tw",
+    (2, 1): "dl",
+    (1, 2): "dl",
+    (0, 3): "tw",
+    (6, 0): "tl",
+    (8, 0): "tl",
+    (5, 1): "dw",
+    (9, 1): "dw",
+    (4, 2): "dl",
+    (10,2): "dl",
+    (3, 3): "tl",
+    (3, 7): "dw",
+    (4, 6): "dl",
+    (5, 5): "tl",
+    (6, 4): "dl",
+}
 
 # Quantities of each letter in the game.
 default_draw_pile = ""\

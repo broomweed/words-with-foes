@@ -4,18 +4,18 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
 
 # words stuff
 from . import contextualize
 from . import word_validation
 from .board_util import get_tile_at, is_tile_at, do_board_move, draw_from_string, draw_from_list, draw2x7, find_full_word
-from .dictionary_data import default_draw_pile, hat_pile
+from .dictionary_data import default_draw_pile, hat_pile, scores, bonus
 
 # models
 from ..models import Game, GameState
 
 # stdlib stuff
-from datetime import datetime
 import json
 import ast
 
@@ -41,13 +41,20 @@ def play(request, game_id=None):
         # (if not p1 or p2 and game isn't public, can't view game)
     page_name = "game #%d" % int(game_id)
 
+    your_turn = False
+    opponent = "doofus"
     if is_p1:
         page_name += (" against %s" % game.player_2.username)
-    elif viewable:
+        opponent = game.player_2
+        if game.p1_turn:
+            your_turn = True
+    elif is_player:
         # if not player 1, but in the game...
         page_name += (" against %s" % game.player_1.username)
+        opponent = game.player_1
+        if not game.p1_turn:
+            your_turn = True
 
-    print(game.game_state.last_word_pos)
     context = {
         "page_name": page_name,
         "navbar": [ { "name": "home", "page": "index" },
@@ -56,9 +63,11 @@ def play(request, game_id=None):
         "game": game,
         "game_id": game_id,
         "game_state": game.game_state,
-        "highlight_squares": ast.literal_eval(game.game_state.last_word_pos),
+        "highlight_squares": ast.literal_eval(game.game_state.last_move_pos),
         "include_game_resources": viewable,
         "viewable": viewable,
+        "your_turn": your_turn,
+        "opponent": opponent,
         "is_p1": is_p1,
     }
     contextualize(context, request)
@@ -130,7 +139,7 @@ def new_game(request, username):
         state.save()
         game.game_state = state
         game.completed = False
-        game.date_started = datetime.now()
+        game.date_started = timezone.now()
         game.last_move = game.date_started
         game.save()
         return HttpResponseRedirect(reverse('play', args=[game.id]))
@@ -169,6 +178,7 @@ def make_move(request):
             # TODO: implement PASSING
             return HttpResponse("malformed request :(\n(you must play at least one tile!)")
         if is_p1:
+            # TODO: this is wrong, you can play a bunch of copies of a letter you have
             for move in moves_made:
                 if move[0] not in game.game_state.p1_letters:
                     return HttpResponse("malformed request :(\n(you must only play letters you have!)")
@@ -253,6 +263,32 @@ def make_move(request):
         # Calculate "full" word that was played (consecutive letters aligned with new tiles)
         last_word_played = find_full_word(new_board, move_locs[0][0], move_locs[0][1], horizontal_word)
 
+        # Calculate bonus score
+        bonus_points = 0
+        multiplier = 1
+        for move in moves_made:
+            if move[1] == -1:
+                continue
+            print("< %s : %d >" % (move[0], scores[move[0]]))
+            bonus_type = bonus.get( (move[1], move[2]) ) or bonus.get( (move[1], 14-move[2]) ) \
+                      or bonus.get( (14-move[2], move[1]) ) or bonus.get( (14-move[2], 14-move[1]) )
+            if bonus_type == None or bonus_type == "c":
+                continue
+            if bonus_type == "tw":
+                print("triple word!")
+                multiplier *= 3
+            if bonus_type == "dw":
+                print("double word!")
+                multiplier *= 2
+            if bonus_type == "tl":
+                print("triple letter!")
+                bonus_points += 2*scores[move[0]]
+            if bonus_type == "dl":
+                print("double letter!")
+                bonus_points += scores[move[0]]
+
+        print("mult: %d, pts: %d" % (multiplier, bonus_points))
+
         # Find words that intersect with the one you played
         intersecting_words = []
         for loc in move_locs:
@@ -261,22 +297,53 @@ def make_move(request):
             intersecting_words.append(find_full_word(new_board, loc[0], loc[1], not horizontal_word))
 
         # Validate words
+        all_words = [last_word_played]
+        all_words += intersecting_words
         bad_words = []
-        if not word_validation.validate(last_word_played):
-            bad_words.append(last_word_played)
-        for word in intersecting_words:
-            if not word_validation.validate(word):
-                if word not in bad_words:
-                    bad_words.append(word)
+        real_words = []
 
+        for word in all_words:
+            result = word_validation.validate(word)
+            if result == 0:
+                continue
+            if result == 1 and word not in real_words:
+                # in dictionary
+                real_words.append(word)
+            if result == 2 and word not in bad_words:
+                # unpronounceable
+                bad_words.append(word)
+
+        error_string = ""
         if len(bad_words) > 0:
             if len(bad_words) == 1:
-                return HttpResponse("sorry, %s is not an acceptable word" % bad_words[0])
+                error_string += "%s doesn't look like a word!\n" % bad_words[0]
             elif len(bad_words) == 2:
-                return HttpResponse("sorry, %s and %s are not acceptable words" % (bad_words[0], bad_words[1]))
+                error_string += "%s and %s don't look like words!\n" % (bad_words[0], bad_words[1])
             else:
                 # gotta get that oxford comma
-                return HttpResponse("sorry, %s, and %s are not acceptable words" % (", ".join(bad_words[:-1]), bad_words[-1]))
+                error_string += "%s, and %s don't look like words!\n" % (", ".join(bad_words[:-1]), bad_words[-1])
+        if len(real_words) > 0:
+            if len(real_words) == 1:
+                error_string += "%s is a real word!\n" % real_words[0]
+            elif len(real_words) == 2:
+                error_string += "%s and %s are real words!\n" % (real_words[0], real_words[1])
+            else:
+                error_string += "%s, and %s are real words!\n" % (", ".join(real_words[:-1]), real_words[-1])
+
+        if len(error_string) > 0:
+            return HttpResponse(error_string)
+
+        # If all words were valid, then score words
+        move_score = 0
+        for letter in last_word_played:
+            move_score += scores[letter]
+        move_score = (move_score + bonus_points) * multiplier
+        for word in intersecting_words:
+            if len(word) == 1:
+                # don't score 1-letter 'words'
+                continue
+            for letter in word:
+                move_score += scores[letter]
 
         # Store most recent move in DB, for highlighting newly-played tiles
         db_moves = []
@@ -298,16 +365,20 @@ def make_move(request):
         # Put everything back in the database now
         if is_p1:
             game.game_state.p1_letters = letters
+            game.game_state.p1_score += move_score
         else:
             game.game_state.p2_letters = letters
+            game.game_state.p2_score += move_score
+        game.game_state.last_move_score = move_score
         game.game_state.draw_pile = draw_pile
-        game.game_state.last_word_pos = repr(db_moves)
+        game.game_state.last_move_pos = repr(db_moves)
         game.game_state.last_word = last_word_played
         game.game_state.board = new_board
+        game.game_state.last_word_defined = False
         game.game_state.save()
         game.someone_moved = True
         game.p1_turn = not game.p1_turn
-        game.last_move = datetime.now()
+        game.last_move = timezone.now()
         game.save()
         return HttpResponse("200" + game.game_state.board + "|" + letters)
     if request.method == "GET":

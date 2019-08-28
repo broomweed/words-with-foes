@@ -1,7 +1,8 @@
+<!doctype html>
 <html>
 <head>
 <title>
-    words with enemies{% if page_name %} - {{ page_name }}{% endif %}
+    {% if page_name %}{{ page_name }} - {% endif %}words with enemies
 </title>
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static "style.css" %}" />
@@ -11,23 +12,21 @@
 <script type="text/javascript">
 board_string = "{{ game_state.board }}";
 {% if is_p1 %}
-letters_string = "{{ game_state.p1_letters }}";
+    letters_string = "{{ game_state.p1_letters }}";
 {% else %}
-letters_string = "{{ game_state.p2_letters }}";
+    letters_string = "{{ game_state.p2_letters }}";
 {% endif %}
 game_id = {{ game_id }};
 {% if highlight_squares %}
-highlight_squares = [
-{% for square in highlight_squares %}
-    [{{ square.0 }}, {{ square.1 }}],
-{% endfor %}
-];
-{% else %}
-"{{ game_state.last_word_pos }}";
-first_highlight_square = null;
-last_highlight_square = null;
+    highlight_squares = [
+    {% for square in highlight_squares %}
+        [{{ square.0 }}, {{ square.1 }}],
+    {% endfor %}
+    ];
 {% endif %}
+your_turn = {% if your_turn %}true{% else %}false{% endif %}; // {{ your_turn }}
 </script>
+<script src="{% static 'interact.min.js' %}"></script>
 {% endif %}
 <link rel="stylesheet" type="text/css" href="{% static "game.css" %}" />
 <script type="text/javascript" src="{% static "game.js" %}"></script>

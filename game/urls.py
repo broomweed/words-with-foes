@@ -12,6 +12,11 @@ urlpatterns = [
     # Ajax move POST URL
     url(r'^ajax/post_move/?$', views.make_move, name='move'),
 
+    # Word definition stuff
+    url(r'^words/?$', views.word_list, name='words'),
+    url(r'^words/(?P<word_name>[a-z]+)/?$', views.definition_list, name='word'),
+    url(r'^send_word/?$', views.send_word, name='send_word'),
+
     # Account stuff
     url(r'^login/?$', views.login_page, name='login'),
     url(r'^register/?$', views.register, name='register'),

@@ -2,41 +2,31 @@
 {% if viewable %}
 </div></div>
     {% if game.someone_moved %}
-        {% if is_p1 and game.p1_turn %}
+        {% if your_turn %}
             <div style="background-color: {{ game.player_2.profile.fav_color }};">
                 <div style="margin: auto; text-align: center;">
-                    <b>{{ game.player_2.username }}</b>
-        {% elif not is_p1 and not game.p1_turn %}
-            <div style="background-color: {{ game.player_1.profile.fav_color }};">
-                <div style="margin: auto; text-align: center;">
-                    <b>{{ game.player_1.username }}</b>
+                    <b>{{ opponent.username }}</b>
         {% else %}
             <div style="background-color: {{ user.profile.fav_color }};">
                 <div style="margin: auto; text-align: center;">
                     you
         {% endif %}
         played
-        <b>{{ game.game_state.last_word }}</b>
+        <a class="black" href="{% url "word" game.game_state.last_word|lower %}"><b>{{ game.game_state.last_word }}</b></a>
         for
-        <b>{# ?? #} 40</b>
+        <b>{{ game.game_state.last_move_score }}</b>
         points.
                 </div>
             </div>
     {% else %}
-        {% if is_p1 and game.p1_turn or not is_p1 and not game.p1_turn %}
+        {% if your_turn %}
             <div style="background-color: {{ user.profile.fav_color }};">
                 <div style="margin: auto; text-align: center;">
                     you
         {% else %}
-            {% if is_p1 %}
-                <div style="background-color: {{ game.player_2.profile.fav_color }};">
-                    <div style="margin: auto; text-align: center;">
-                        <b>{{ game.player_2.username }}</b>
-            {% else %}
-                <div style="background-color: {{ game.player_1.profile.fav_color }};">
-                    <div style="margin: auto; text-align: center;">
-                        <b>{{ game.player_1.username }}</b>
-            {% endif %}
+            <div style="background-color: {{ game.player_2.profile.fav_color }};">
+                <div style="margin: auto; text-align: center;">
+                    <b>{{ opponent.username }}</b>
         {% endif %}
         must make the first move!
                 </div>
@@ -51,6 +41,27 @@
     </div>
 </div>
 </div></div>
+{% if not your_turn and not game.game_state.last_word_defined %}
+<div style="text-align: center;">
+    <div style="margin: auto; text-align: center; width: 700px;">
+        <br />
+        <form action="{% url "send_word" %}" method="post">
+        define <a class="black" href="{% url "word" game.game_state.last_word|lower %}"><b>{{ game.game_state.last_word }}</b></a>:
+                <input type="hidden" name="word" value="{{ game.game_state.last_word }}" />
+                <input type="hidden" name="game_id" value="{{ game.id }}" />
+                <input type="radio" name="pos" value="n." class="pos" id="pos-n" /> <label for="pos-n">n.</label>
+                <input type="radio" name="pos" value="adj." class="pos" id="pos-aj" /> <label for="pos-aj">adj</label>
+                <input type="radio" name="pos" value="v." class="pos" id="pos-v" /> <label for="pos-v">v.</label>
+                <input type="radio" name="pos" value="adv." class="pos" id="pos-ad" /> <label for="pos-ad">adv</label>
+                <br />
+                <textarea name="definition"></textarea>
+                <br />
+                {% csrf_token %}
+                <input type="submit" value=" ok " />
+        </form>
+    </div>
+</div>
+{% endif %}
 <br />
 <div style="width: 100%; background-color: {{ game.player_1.profile.fav_color }}">
     <div style="width: 535px; margin: auto">

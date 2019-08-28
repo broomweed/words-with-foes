@@ -18,6 +18,11 @@
 <div id="content-wrapper">
     <div id="content">
         <div style="width: 700px; margin: auto">
+{% if viewed.username != user.username %}
+            <br />
+            <a href="{% url "challenge" viewed.username %}">start a new game with {{ viewed.username }}</a>
+            <br />
+{% endif %}
             <br />
             date joined: <b>{{ datejoined | datefmt }}</b><br />
             &nbsp;last login: <b>{{ lastseen | datefmt }}</b>
@@ -27,8 +32,13 @@
             <div style="display: inline-block; max-width: 490px; padding-top: 2px; white-space: pre-line"> <!-- nifty trick!! white-space: pre-line; wraps on line breaks! who knew! -->{{ viewed.profile.bio }}</div>
 {% endif %}
             <br /><br />
-{% if viewed.username != user.username %}
-            <a href="{% url "challenge" viewed.username %}">start a new game with {{ viewed.username }}</a>
+{% if defs|length > 0 %}
+            <i>words defined</i>
+            <ul>
+{% for def in defs %}
+                <li class="definition"><a href="{% url "word" def.word.name %}" class="black"><b>{{ def.word.name }}</b></a> <b><i>{{ def.part_of_speech }}</i></b> {{ def.text }}</li>
+{% endfor %}
+            </ul>
 {% endif %}
         </div>
 {% include "game/footer.html" %}

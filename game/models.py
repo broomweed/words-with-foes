@@ -10,24 +10,37 @@ import ast
 class ListField(models.CharField):
     pass
 
+class Word(models.Model):
+    name = models.CharField(max_length=15, unique=True)
+    last_updated = models.DateTimeField('last updated', auto_now_add=True)
+
+class Definition(models.Model):
+    word = models.ForeignKey(Word, on_delete=models.CASCADE)
+    submitter = models.ForeignKey(User, on_delete=models.CASCADE)
+    part_of_speech = models.CharField(max_length=4)
+    text = models.TextField()
+    date_submitted = models.DateTimeField('date submitted', auto_now_add=True)
+
 class GameState(models.Model):
     p1_letters = models.CharField(max_length=7)
     p2_letters = models.CharField(max_length=7)
     board = models.CharField(max_length=225)
     draw_pile = models.CharField(max_length=150)
     last_word = models.CharField(max_length=15)
-    last_word_pos = models.CharField(max_length=150, default="[]")
+    last_move_pos = models.CharField(max_length=150, default="[]")
+    last_move_score = models.IntegerField(default=0)
     p1_score = models.IntegerField(default=0)
     p2_score = models.IntegerField(default=0)
+    last_word_defined = models.BooleanField(default=False)
 
     def __str__(self):
         return 'Game state #'+str(self.id)
 
 class Game(models.Model):
     # Player 1 is the player who created the game
-    player_1 = models.ForeignKey(User, related_name='wordsgame_first_player')
+    player_1 = models.ForeignKey(User, related_name='wordsgame_first_player', on_delete=models.CASCADE)
     # Player 2 is the player who accepted the game
-    player_2 = models.ForeignKey(User, related_name='wordsgame_second_player')
+    player_2 = models.ForeignKey(User, related_name='wordsgame_second_player', on_delete=models.CASCADE)
     date_started = models.DateTimeField('date started')
     last_move = models.DateTimeField('last move')
     completed = models.BooleanField('completed')
@@ -44,7 +57,7 @@ class Game(models.Model):
             return self.player_1.username + ' vs. ' + self.player_2.username
 
 class Profile(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     fav_color = models.CharField(max_length=30)
     bio = models.TextField()

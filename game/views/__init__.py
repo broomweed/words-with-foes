@@ -23,3 +23,4 @@ def contextualize(context, request):
 
 from .account_views import *
 from .game_views import *
+from .word_views import *

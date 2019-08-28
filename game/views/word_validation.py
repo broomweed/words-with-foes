@@ -1,22 +1,27 @@
 from .board_util import get_tile_at, is_tile_at
 from .dictionary_data import dictionary, transitions
 
+# Validate word for real-word-ness and pronounceability/vowel-having-ness.
+# Returns
+#   0 if word valid
+#   1 if word real
+#   2 if word unpronounceable
 def validate(string):
     string = string.lower()
 
     if len(string) == 1:
         # 1-letter "words" are always OK
-        return True
+        return 0
 
     if string in dictionary:
-        return False
+        return 1
 
     # Avoid words without vowels
     for let in ['a', 'e', 'i', 'o', 'u', 'y']:
         if let in string:
             break
     else:
-        return False
+        return 2
 
     # if passed basic checks, make sure word is 'pronounceable'
     border_string = "*" + string + "*"
@@ -25,11 +30,11 @@ def validate(string):
         key_string = border_string[val_index] + border_string[val_index+1]
         val_string = border_string[val_index+2]
         if key_string not in transitions:
-            return False
+            return 2
         if val_string not in transitions[key_string]:
-            return False
+            return 2
 
-    return True
+    return 0
 
 def validate_board(board):
     working_word = []

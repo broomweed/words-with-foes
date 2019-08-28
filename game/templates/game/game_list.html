@@ -69,7 +69,7 @@
                     <b>{{ game.last_move|datetimefmt }}</b>
                 </div>
                 <div style="width: 100%;">
-                    they played <b>{{ game.game_state.last_word }}</b> for <b>40</b> pts.
+                    they played <b>{{ game.game_state.last_word }}</b> for <b>{{ game.game_state.last_move_score }}</b> pts.
                 </div>
                 {% else %}
                 <div style="text-align: right;">
@@ -120,7 +120,7 @@
                     <b>{{ game.last_move|datetimefmt }}</b>
                 </div>
                 <div style="width: 100%;">
-                    you played <b>{{ game.game_state.last_word }}</b> for <b>40</b> pts.
+                    you played <b>{{ game.game_state.last_word }}</b> for <b>{{ game.game_state.last_move_score }}</b> pts.
                 </div>
                 {% else %}
                 <div style="text-align: right;">

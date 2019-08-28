@@ -2,7 +2,7 @@
 </div>
 <div style="width: 100%; background-color: {{ challenged.profile.fav_color }}">
 <div style="width: 700px; margin: auto; text-align: left">
-create game with <b>{{ challenged.username }}</b>
+challenge <b>{{ challenged.username }}</b>
 </div>
 </div>
 <br />
@@ -23,7 +23,7 @@ create game with <b>{{ challenged.username }}</b>
         <br />
         {% csrf_token %}
         <!--div style="width: 100%; text-align: right;"-->
-            &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value=" create " />
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" value=" challenge " />
         <!--/div-->
     </div>
 </form>

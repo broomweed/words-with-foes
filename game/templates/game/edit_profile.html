@@ -9,15 +9,11 @@
 </div>
 {% endif %}
 </div></div>
-<div class="content-wrapper" style="background-color: {% if msg %}{{ user.profile.fav_color }}{% else %}{{ viewed.profile.fav_color }}{% endif %}"><div class="content"><div style="width: 600px; margin: auto; text-align: left;">
-{% if msg %}
-&#x2713; {{ msg }}
-{% else %}
+<div class="content-wrapper" style="background-color: {{ viewed.profile.fav_color }}"><div class="content"><div style="width: 600px; margin: auto; text-align: left;">
 {% if viewed.username == user.username %}
 <i>edit your profile</i>
 {% else %}
 <i>edit <b>{{ viewed.username }}</b>'s profile</i>
-{% endif %}
 {% endif %}
 </div></div></div>
 <div class="content-wrapper"><div class="content"><div style="width: 600px; margin: auto;">
@@ -36,6 +32,13 @@ favorite color:
 <textarea name="bio">{{ viewed.profile.bio }}</textarea>
 </div>
 <br />
+{% if msg %}
+</div></div></div>
+<div class="content-wrapper" style="background-color: {{ user.profile.fav_color }}"><div class="content"><div style="width: 600px; margin: auto; text-align: left;">
+&#x2713; {{ msg }}
+</div></div></div>
+<div class="content-wrapper"><div class="content"><div style="width: 600px; margin: auto;">
+{% endif %}
 <br />
 <div style="text-align: right;">
 {% csrf_token %}

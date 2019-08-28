@@ -41,100 +41,107 @@ function render() {
     for (var row in board) {
         for (var col in board[row]) {
             if (board[row][col] == ' ') {
-                var move_here = false;
+                var move_here = null;
                 for (var m in move) {
                     if (move[m] != null && move[m][0] == col && move[m][1] == row) {
-                        if (id_about_to_place != m) {
-                            board_text += "<span class='tile newtile'><a href='#' onclick='select("+m+")'><b>"+letters[m] + "</b>" + score_char(letters[m]) + "</a></span>";
-                        } else {
-                            board_text += "<span class='tile newtile selected'><a href='#' onclick='select(-1)'><b>"+letters[m]+"</b>" + score_char(letters[m]) + "</a></span>";
-                        }
-                        move_here = true;
+                        move_here = m;
                     }
                 }
-                if (!move_here) {
-                    var bonus_here = "";
-                    for (var i in bonus) {
-                        if ((bonus[i][0] == col && bonus[i][1] == row)
-                            || (14-bonus[i][0] == col && 14-bonus[i][1] == row)
-                            || (14-bonus[i][0] == row && bonus[i][1] == col)
-                            || (bonus[i][0] == row && 14-bonus[i][1] == col)) {
-                            bonus_here = bonus[i][2];
-                        }
+                var bonus_here = "";
+                for (var i in bonus) {
+                    if ((bonus[i][0] == col && bonus[i][1] == row)
+                        || (14-bonus[i][0] == col && 14-bonus[i][1] == row)
+                        || (14-bonus[i][0] == row && bonus[i][1] == col)
+                        || (bonus[i][0] == row && 14-bonus[i][1] == col)) {
+                        bonus_here = bonus[i][2];
                     }
-                    if (bonus_here != "") {
-                        if (bonus_here != "c") {
-                            bonus_display = bonus_here.replace("l", "&#x1D38;").replace("w", "&#x1D42;").replace("d", "2").replace("t", "3");
-                            board_text += "<span class='tile bonus'><span class='"+bonus_here+"'><a href='#' id='"+col+","+row+"' class='place'>"+bonus_display+"</a></span></span>";
-                        } else {
-                            board_text += "<span class='tile bonus center'><a href='#' id='"+col+","+row+"' class='place'>&#x207A;&#x208A;</a></span>";
-                        }
+                }
+                board_text += "<div class='tile empty' id='square"+col+","+row+"'>";
+                if (bonus_here != "") {
+                    if (bonus_here != "c") {
+                        bonus_display = bonus_here.replace("l", "&#x1D38;").replace("w", "&#x1D42;").replace("d", "2").replace("t", "3");
+                        board_text += "<div class='under bonus'><div class='"+bonus_here+"'><a id='"+col+","+row+"' class='place'>"+bonus_display+"</a></div></div>";
                     } else {
-                        board_text += "<span class='tile off'><a href='#' id='"+col+","+row+"' class='place'>&nbsp;&nbsp;</a></span>";
+                        board_text += "<div class='under bonus center'><a id='"+col+","+row+"' class='place'>&#x207A;&#x208A;</a></div>";
+                    }
+                } else {
+                    board_text += "<div class='under off'><a id='"+col+","+row+"' class='place'>&nbsp;&nbsp;</a></div>";
+                }
+                if (move_here) {
+                    if (id_about_to_place != m) {
+                        board_text += "<div class='tile newtile draggable' id='tile"+move_here+"'><a onclick='select("+move_here+")'><b>"
+                            +letters[move_here] + "</b>" + score_char(letters[move_here]) + "</a></div>";
+                    } else {
+                        board_text += "<div class='tile newtile selected draggable' id='tile"+move_here+"'><a onclick='select(-1)'><b>"
+                            +letters[move_here]+"</b>" + score_char(letters[move_here]) + "</a></div>";
                     }
                 }
+                board_text += "</div>";
             } else {
                 if (highlight_squares && point_highlighted(col, row)) {
-                    board_text += "<span class='tile oldtile last'>" + board[row][col] + score_char(board[row][col]) + "</span>";
+                    board_text += "<div class='tile oldtile last'>" + board[row][col] + score_char(board[row][col]) + "</div>";
                 } else {
-                    board_text += "<span class='tile oldtile'>" + board[row][col] + score_char(board[row][col]) + "</span>";
+                    board_text += "<div class='tile oldtile'>" + board[row][col] + score_char(board[row][col]) + "</div>";
                 }
             }
         }
         board_text += "<br />";
     }
-    board_text += "<br />{";
-    for (var p = 0; p < 7; p++) {
-        var letter_found = false
-        for (var l in letters) {
-            if (move[l][0] == -1 && move[l][1] == p) {
-                if (letters[l] == "-" || letters[l] == " ") {
-                    letter_found = false;
-                } else {
-                    if (id_about_to_place == l) {
-                        board_text += "<span class='tile newtile selected'><a href='#' onclick='select(-1)'><b>"+letters[l]+"</b>" + score_char(letters[l]) + "</a></span>";
+    if (your_turn) {
+        board_text += "<br />{";
+        for (var p = 0; p < 7; p++) {
+            var letter_found = false
+            for (var l in letters) {
+                if (move[l][0] == -1 && move[l][1] == p) {
+                    if (letters[l] == "-" || letters[l] == " ") {
+                        letter_found = false;
                     } else {
-                        board_text += "<span class='tile newtile'><a href='#' onclick='select("+l+")'><b>"+letters[l]+"</b>" + score_char(letters[l]) + "</a></span>";
+                        if (id_about_to_place == l) {
+                            board_text += "<div class='nottile empty' id='square-1,"+p+"'><div class='tile newtile selected draggable' id='tile"+l+"'><a onclick='select(-1)'><b>"+letters[l]+"</b>" + score_char(letters[l]) + "</a></div>__</div>";
+                        } else {
+                            board_text += "<div class='nottile empty' id='square-1,"+p+"'><div class='tile newtile draggable' id='tile"+l+"'><a onclick='select("+l+")'><b>"+letters[l]+"</b>" + score_char(letters[l]) + "</a></div>__</div>";
+                        }
+                        letter_found = true;
+                        break;
                     }
-                    letter_found = true;
                 }
             }
+            if (!letter_found) {
+                /*if (id_about_to_place == l) {
+                  board_text += "<div class='tile return'><a href='#' onclick='recall("+l+")'><b>" + letters[l] + "</b>&#x2193;</a></div>";
+                  } else {*/
+                board_text += "<div class='nottile empty' id='square-1,"+p+"'><a onclick='recall("+p+")'>__</a></div>";
+                //}
+            }
         }
-        if (!letter_found) {
-            /*if (id_about_to_place == l) {
-              board_text += "<span class='tile return'><a href='#' onclick='recall("+l+")'><b>" + letters[l] + "</b>&#x2193;</a></span>";
-              } else {*/
-            board_text += "<span class='nottile'><a href='#' onclick='recall("+p+")'>__</a></span>";
-            //}
+        board_text += "}";
+        var moved_pieces = 0;
+        for (var i = 0; i < move.length; i++) {
+            if (move[i][0] != -1) {
+                moved_pieces++;
+            }
         }
-    }
-    board_text += "}";
-    var moved_pieces = 0;
-    for (var i = 0; i < move.length; i++) {
-        if (move[i][0] != -1) {
-            moved_pieces++;
+        board_text += "<br /><br />";
+        if (moved_pieces > 0) {
+            board_text += " <a href='#' onclick='recall_all()'>&#8634; recall</a>";
+        } else {
+            board_text += " &#8634; recall";
         }
-    }
-    board_text += "<br /><br />";
-    if (moved_pieces > 0) {
-        board_text += " <a href='#' onclick='recall_all()'>&#8634; recall</a>";
-    } else {
-        board_text += " &#8634; recall";
-    }
-    board_text += " <a href='#' onclick='shuffle()'>&#8605; shuffle</a> ";
-    var can_play = false;
-    for (var m in move) {
-        if (move[m][0] != -1) {
-            can_play = true;
-            break;
+        board_text += " <a href='#' onclick='shuffle()'>&#8605; shuffle</a> ";
+        var can_play = false;
+        for (var m in move) {
+            if (move[m][0] != -1) {
+                can_play = true;
+                break;
+            }
         }
-    }
-    if (can_play) {
-        board_text += "<a href='#' onclick='send_move()'>";
-    }
-    board_text += "&#x2713; send move"
-    if (can_play) {
-        board_text += "</a>";
+        if (can_play) {
+            board_text += "<a href='#' onclick='send_move()'>";
+        }
+        board_text += "&#x2713; send move"
+        if (can_play) {
+            board_text += "</a>";
+        }
     }
     if (error != "") {
         board_text += "<br /><br />"+error;
@@ -224,6 +231,7 @@ function shuffleArray(array) {
 function select(tile_id) {
     id_about_to_place = tile_id;
     render();
+    return false;
 }
 
 function score_char(chara) {
@@ -360,4 +368,53 @@ function point_highlighted(x, y) {
         }
     }
     return false;
+}
+
+interact('.draggable').draggable({
+    onmove: dragMoveListener,
+});
+
+interact('.empty').dropzone({
+    ondragenter: function(event) {
+        event.target.classList.add('droppy');
+    },
+    ondragleave: function(event) {
+        event.target.classList.remove('droppy');
+    },
+    ondrop: function(event) {
+        tile_id = event.relatedTarget.id.replace(/tile/, '');
+        square_pos = event.target.id.replace(/square/, '').split(',');
+        for (var id in move) {
+            if (move[id][0] == square_pos[0] && move[id][1] == square_pos[1]) {
+                // if already something there, swap 'em
+                if (letters[id] != "-") {
+                    // ...unless it's an empty space on the rack -
+                    // the 'break' out of the tile-rack-finding loop takes care of that
+                    // (since this can result in duplicate 'move' entries for blank spaces,
+                    //  but they correct when tiles are moved out of the rack... it's complicated)
+                    move[id] = move[tile_id];
+                }
+            }
+        }
+        move[tile_id] = [square_pos[0], square_pos[1]];
+        render();
+    },
+});
+
+function dragMoveListener (event) {
+    var target = event.target,
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+    // translate the element
+    target.style.webkitTransform =
+        target.style.transform =
+        'translate(' + x + 'px, ' + y + 'px)';
+
+    // update the posiion attributes
+    target.setAttribute('data-x', x);
+    target.setAttribute('data-y', y);
+
+    id_about_to_place = -1;
 }

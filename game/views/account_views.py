@@ -8,6 +8,8 @@ from django.shortcuts import render
 
 from . import contextualize
 
+from ..models import Definition
+
 def login_page(request):
     if request.user.is_authenticated:
         context = {
@@ -152,11 +154,13 @@ def profile(request, username=None):
     if username is None:
         return Http404("no user name provided!")
     user = User.objects.get(username=username)
+    defs = Definition.objects.filter(submitter=user)
     context = { "page_name": user.username,
                 "navbar": [ { "name": "home", "page": "index" },
                             { "name": "users", "page": "userlist" },
                           ],
                 "viewed": user,
+                "defs": defs,
                 #"datejoined": str("{dt:%b} {dt.day} {dt.year}").format(dt=user.date_joined),
                 #"lastseen": str("{dt:%b} {dt.day} {dt.year}").format(dt=user.last_login),
                 "datejoined": user.date_joined,

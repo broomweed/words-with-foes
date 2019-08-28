@@ -1,0 +1,19 @@
+{% include "game/header.html" %}
+{% if definitions|length == 1 %}
+definition
+{% else %}
+definitions
+{% endif %}
+for <b>{{ word_name|upper }}</b><br />
+<br />
+<div>
+{% if definitions %}
+{% for def in definitions %}
+<div class="definition"><b><i>{{ def.part_of_speech }}</i></b> {{ def.text }}</div>
+<div style="text-align: right;"><i>&mdash; <a class="black" href="{% url "profile" def.submitter.username %}">{{ def.submitter.username }}</a></i></div><br />
+{% endfor %}
+{% else %}
+no definitions so far!
+{% endif %}
+</div>
+{% include "game/footer.html" %}

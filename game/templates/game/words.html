@@ -1,0 +1,6 @@
+{% include "game/header.html" %}
+{% for word in words %}
+<a href="{% url "word" word.name %}">{{ word.name|upper }}</a> ({{ word.num_defs }})
+<br />
+{% endfor %}
+{% include "game/footer.html" %}
